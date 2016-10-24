@@ -1,0 +1,14 @@
+name: immutable
+author: jonah williams <jonahwilliams@google.com>
+version: 0.0.1
+homepage: https://github.com/jonahwilliams/immutable-dart
+description: immutable, persistent data structures for Dart and Flutter.
+
+enviornment:
+  sdk: ">=1.8.0 <2.0.0"
+
+dependencies:
+  meta:
+
+dev_dependencies:
+  test: ">=0.12.0 <0.13.0"
