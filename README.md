@@ -50,4 +50,3 @@ Using a Vector as an immutable Stack
 * Support transients for efficient mutations (internally and externally)
 * Finish Vector, Dictionary, and LazyIterable APIs (sort, flatMap?)
 * Large benchmark tests
-

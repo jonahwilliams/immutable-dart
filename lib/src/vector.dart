@@ -56,12 +56,7 @@ abstract class Vector<T> implements Iterable<T> {
   Iterator<T> get iterator => new _VectorIterator(this);
 
   @override
-  T get last {
-    if (isEmpty) {
-      throw new StateError('Vector is empty and has no last value.');
-    }
-    return this[length - 1];
-  }
+  T get last => this[length - 1];
 
   @override
   int get length;
@@ -87,6 +82,7 @@ abstract class Vector<T> implements Iterable<T> {
   ///
   /// Throws a state error if it is empty.
   Vector<T> removeLast();
+
 
   /// Creates a new Vector with [value] append to the end.
   Vector<T> append(T value);
