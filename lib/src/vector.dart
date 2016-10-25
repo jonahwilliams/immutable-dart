@@ -1,6 +1,6 @@
 import 'package:meta/meta.dart';
 
-/// The Mask
+/// The Mask `31`
 const int _mask = (1 << 5) - 1;
 
 /// 32
@@ -291,7 +291,19 @@ abstract class Node<T> {
   /// Produces a new path with the given index and shift.
   Node<T> copy(int index, int shift, T value);
 
-  /// returns the provided index.
+  /// Retrieves the value at the [index].
+  ///
+  /// with a depth of two, when we grab an index we need to calculate
+  /// 5 bits at a time.  [shift] tells you how far to shift to grab the right
+  /// bits.
+  ///
+  /// for a tree of depth two:
+  ///   shift = 5 * (2 - 1)
+  /// ‎  shift = 5
+  ///   0b1000000000 >> 5
+  ///   0b1000 & 11110
+  ///   0b1000
+  ///   index is 8.
   T get(int index, int shift);
 
   /// mutates the provided index.
