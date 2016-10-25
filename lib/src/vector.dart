@@ -1,10 +1,10 @@
 import 'package:meta/meta.dart';
 
 /// The Mask
-const int mask = (1 << 5) - 1;
+const int _mask = (1 << 5) - 1;
 
 /// 32
-const int trieSize = 32;
+const int _trieSize = 32;
 
 /// [Vector] is a persistent bit-partitioned Vector trie based on Clojure
 /// and Scala implementations.
@@ -21,6 +21,7 @@ abstract class Vector<T> implements Iterable<T> {
     if (xs.isEmpty) {
       return new _ImmutableVector.empty();
     }
+
     final length = xs.length;
     // calculate the necessary depth of the tree by bit shifting by 2^5.
     int shift = length;
@@ -29,6 +30,7 @@ abstract class Vector<T> implements Iterable<T> {
       depth++;
       shift = shift >> 5;
     }
+
     final root = fromDepth/*<T>*/(depth);
     var index = 0;
     for (final x in xs) {
@@ -42,25 +44,20 @@ abstract class Vector<T> implements Iterable<T> {
   factory Vector.empty() => new _ImmutableVector.empty();
 
   @override
-  T get first {
-    if (length == 0) {
-      throw new StateError('Empty Vector has no first value.');
-    }
-    return this[0];
-  }
+  T get first => this[0];
 
   @override
   bool get isEmpty => length == 0;
 
   @override
-  bool get isNotEmpty => length != 0;
+  bool get isNotEmpty => !isEmpty;
 
   @override
   Iterator<T> get iterator => new _VectorIterator(this);
 
   @override
   T get last {
-    if (length == 0) {
+    if (isEmpty) {
       throw new StateError('Vector is empty and has no last value.');
     }
     return this[length - 1];
@@ -77,7 +74,7 @@ abstract class Vector<T> implements Iterable<T> {
     throw new StateError('Vector has length $length');
   }
 
-  /// used to implemented [Iterable] methods.
+  /// Forwards to an iterable of the underlying values.
   @protected
   Iterable<T> get _values;
 
@@ -89,7 +86,7 @@ abstract class Vector<T> implements Iterable<T> {
   /// Returns a Vector without the last item
   ///
   /// Throws a state error if it is empty.
-  Vector<T> remove();
+  Vector<T> removeLast();
 
   /// Creates a new Vector with [value] append to the end.
   Vector<T> append(T value);
@@ -104,13 +101,7 @@ abstract class Vector<T> implements Iterable<T> {
   bool contains(Object value) => _values.contains(value);
 
   @override
-  T elementAt(int index) {
-    if (index >= length || index < 0) {
-      throw new StateError(
-          'Index $index out of bounds for Vector of length $length');
-    }
-    return this[index];
-  }
+  T elementAt(int index) => this[index];
 
   @override
   bool every(Predicate<T> test) => _values.every(test);
@@ -216,7 +207,7 @@ class _ImmutableVector<T> extends Vector<T> {
 
   @override
   Vector<T> append(T value) {
-    if (length >= trieSize << (5 * (depth - 1))) {
+    if (length >= _trieSize << (5 * (depth - 1))) {
       final xs = new List<Node<T>>(32);
       final shift = 5 * (depth - 1);
       xs[0] = _root;
@@ -241,7 +232,7 @@ class _ImmutableVector<T> extends Vector<T> {
   }
 
   @override
-  Vector<T> remove() {
+  Vector<T> removeLast() {
     // TODO: shrink Vector.
     final newRoot = _root.copy(length - 1, 5 * (depth - 1), null);
     return new _ImmutableVector.fromRoot(length - 1, depth, newRoot);
@@ -314,13 +305,13 @@ abstract class Node<T> {
 class Branch<T> extends Node<T> {
   final List<Node<T>> values;
 
-  Branch.empty() : values = new List(trieSize);
+  Branch.empty() : values = new List(_trieSize);
   Branch.fromList(this.values);
 
   Node<T> copy(int index, int shift, T value) {
-    List<Node<T>> results = new List(trieSize);
-    final key = ((index & 0xFFFFFFFF) >> shift) & mask;
-    for (int i = 0; i < trieSize; i++) {
+    List<Node<T>> results = new List(_trieSize);
+    final key = ((index & 0xFFFFFFFF) >> shift) & _mask;
+    for (int i = 0; i < _trieSize; i++) {
       if (i == key) {
         final res = values[i];
         if (res == null) {
@@ -338,15 +329,15 @@ class Branch<T> extends Node<T> {
   }
 
   T get(int index, int shift) {
-    return values[((index & 0xFFFFFFFF) >> shift) & mask].get(index, shift - 5);
+    return values[((index & 0xFFFFFFFF) >> shift) & _mask].get(index, shift - 5);
   }
 
   void set(int index, int shift, T value) {
-    values[((index & 0xFFFFFFFF) >> shift) & mask].set(index, shift - 5, value);
+    values[((index & 0xFFFFFFFF) >> shift) & _mask].set(index, shift - 5, value);
   }
 
   Iterable<T> traverse() sync* {
-    for (int i = 0; i < trieSize; i++) {
+    for (int i = 0; i < _trieSize; i++) {
       final value = values[i];
       if (value == null) {
         return;
@@ -361,13 +352,13 @@ class Leaf<T> extends Node<T> {
   /// The values contained in the leaf.
   final List<T> values;
 
-  Leaf.empty() : values = new List(trieSize);
+  Leaf.empty() : values = new List(_trieSize);
   Leaf.fromList(this.values);
 
   Node<T> copy(int index, int _, T value) {
-    List<T> results = new List(trieSize);
-    final key = index & mask;
-    for (int i = 0; i < trieSize; i++) {
+    List<T> results = new List(_trieSize);
+    final key = index & _mask;
+    for (int i = 0; i < _trieSize; i++) {
       if (key == i) {
         results[i] = value;
       } else {
@@ -378,15 +369,15 @@ class Leaf<T> extends Node<T> {
   }
 
   T get(int index, int _) {
-    return values[index & mask];
+    return values[index & _mask];
   }
 
   void set(int index, int _, T value) {
-    values[index & mask] = value;
+    values[index & _mask] = value;
   }
 
   Iterable<T> traverse() sync* {
-    for (int i = 0; i < trieSize; i++) {
+    for (int i = 0; i < _trieSize; i++) {
       final value = values[i];
       if (value == null) {
         return;
@@ -405,8 +396,8 @@ Node<T> fromDepth/*<T>*/(int depth) {
   if (depth == 1) {
     return new Leaf.empty();
   }
-  List<Node<T>> values = new List(trieSize);
-  for (int i = 0; i < trieSize; i++) {
+  List<Node<T>> values = new List(_trieSize);
+  for (int i = 0; i < _trieSize; i++) {
     values[i] = fromDepth/*<T>*/(depth - 1);
   }
   return new Branch.fromList(values);

@@ -43,10 +43,10 @@ void main() {
         });
 
         test('increases length by 1', () {
-          var vecEmpty = empty.append(-1);
-          var vecShort = short.append(-1);
-          var vecMedium = medium.append(-1);
-          var vecLong = long.append(-1);
+          final vecEmpty = empty.append(-1);
+          final vecShort = short.append(-1);
+          final vecMedium = medium.append(-1);
+          final vecLong = long.append(-1);
 
           expect(vecEmpty.length, equals(1));
           expect(vecShort.length, equals(32));
@@ -55,10 +55,10 @@ void main() {
         });
 
         test('sets last element to 1', () {
-          var vecEmpty = empty.append(1);
-          var vecShort = short.append(1);
-          var vecMedium = medium.append(1);
-          var vecLong = long.append(1);
+          final vecEmpty = empty.append(1);
+          final vecShort = short.append(1);
+          final vecMedium = medium.append(1);
+          final vecLong = long.append(1);
 
           expect(vecEmpty[0], equals(1));
           expect(vecShort[31], equals(1));
@@ -140,7 +140,7 @@ void main() {
       test('remove', () {
         final list = new List.generate(10, (i) => i);
         final vec = new Vector.fromIterable(list);
-        final vec2 = vec.remove();
+        final vec2 = vec.removeLast();
         expect(vec, orderedEquals(list));
         expect(vec2, orderedEquals([0, 1, 2, 3, 4, 5, 6, 7, 8]));
       });
