@@ -389,6 +389,7 @@ class Leaf<T> extends Node<T> {
 
   Iterable<T> traverse() sync* {
     for (int i = 0; i < _trieSize; i++) {
+
       final value = values[i];
       if (value == null) {
         return;
