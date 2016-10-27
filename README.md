@@ -45,6 +45,24 @@ Using a Vector as an immutable Stack
     print(stack.length); // prints "0"
 ```
 
+### Dictionary
+
+Creating a Dictionary from a Map.
+```dart
+    final dict = new Dictionary<String, int>.from({'one': 1, 'two': 2, 'three': 3});
+    print(dict['one']); //prints "1"
+
+```
+
+Adding and removing values from the Dictionary.
+```dart
+    var cache = new Dictionary<String, int>.empty();
+    cache = cache.assoc("foo", 2);
+    cache = cache.assoc("bar", 3);
+    cache = cache.remove("foo");
+    print(cache["foo"]); // prints "null"
+    print(cache["bar"]); // print "3"
+```
 
 ## Todo
 * Support transients for efficient mutations (internally and externally)
