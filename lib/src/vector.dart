@@ -91,7 +91,8 @@ abstract class Vector<T> implements Iterable<T> {
   /// Creates a new Vector with [value] append to the end.
   Vector<T> append(T value);
 
-  /// Creates a new Vector with the _values from [other] concatenated on the end.
+  /// Creates a new Vector with the _values from [other] concatenated 
+  /// on the end.
   Vector<T> concat(Iterable<T> other);
 
   @override
@@ -341,11 +342,13 @@ class Branch<T> extends Node<T> {
   }
 
   T get(int index, int shift) {
-    return values[((index & 0xFFFFFFFF) >> shift) & _mask].get(index, shift - 5);
+    return values[((index & 0xFFFFFFFF) >> shift) & _mask]
+        .get(index, shift - 5);
   }
 
   void set(int index, int shift, T value) {
-    values[((index & 0xFFFFFFFF) >> shift) & _mask].set(index, shift - 5, value);
+    values[((index & 0xFFFFFFFF) >> shift) & _mask]
+        .set(index, shift - 5, value);
   }
 
   Iterable<T> traverse() sync* {

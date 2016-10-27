@@ -146,6 +146,14 @@ void main() {
       });
     });
 
+    group('really long list', () {
+      test('65K elements', () {
+        final source = new List.generate(64000, (i) => i);
+        final vec = new Vector.fromIterable(source);
+        expect(vec, orderedEquals(source));
+      });
+    });
+
     group('Iterable', () {
       List<int> src;
       Vector<int> vec;
