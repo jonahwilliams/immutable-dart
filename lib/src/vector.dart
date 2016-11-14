@@ -11,7 +11,7 @@ const int _trieSize = 32;
 abstract class Vector<T> implements Iterable<T> {
   const Vector._();
 
-  /// Creates a new Vector from any interable.
+  /// Creates a new Vector from any Iterable.
   ///
   /// example:
   ///   final xs = new Vector.fromIterable([1, 2, 3, 4]);
@@ -87,7 +87,7 @@ abstract class Vector<T> implements Iterable<T> {
   /// Creates a new Vector with [value] append to the end.
   Vector<T> append(T value);
 
-  /// Creates a new Vector with the _values from [other] concatenated 
+  /// Creates a new Vector with the _values from [other] concatenated
   /// on the end.
   Vector<T> concat(Iterable<T> other);
 

@@ -77,11 +77,13 @@ abstract class Dictionary<K, V> {
   @override
   String toString() {
     final StringBuffer buffer = new StringBuffer();
-    buffer.write('(');
+    buffer.write('{');
+    var sep = '';
     for (final pair in _pairs) {
-      buffer.write('${pair.first} -> ${pair.second}, ');
+      buffer.write('$sep${pair.first}: ${pair.second}');
+      sep = ', ';
     }
-    buffer.write(')');
+    buffer.write('}');
     return buffer.toString();
   }
 }
@@ -511,7 +513,7 @@ class _CollisionNode<K, V> extends _Node<K, V> {
     if (newKeys.length == 1) {
       return new _LeafNode<K, V>(newKeys[0], newValues[0]);
     } else {
-      return new CollisionNode<K, V>(newKeys, newValues, _hashcode);
+      return new _CollisionNode<K, V>(newKeys, newValues, _hashcode);
     }
   }
 

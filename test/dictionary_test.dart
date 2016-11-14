@@ -64,6 +64,11 @@ void main() {
       expect(modified[key2], 2);
       expect(modified[key3], 3);
     });
+
+    test('prints correctly', () {
+      final dict = new Dictionary.fromIterables([1, 2, 3], [1, 2, 3]);
+      expect(dict.toString(), '{1: 1, 2: 2, 3: 3}');
+    });
   });
 }
 
