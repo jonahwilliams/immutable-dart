@@ -335,7 +335,8 @@ class _BitmapIndexNode<K, V> extends _Node<K, V> {
     final bit = bitpos(hash, _shift);
     if ((_bitmap & bit) != 0) {
       // TODO: compaction to null if empty.
-      final newNodes = new List<_Node<K, V>>.from(_nodes)..removeAt(_index(bit));
+      final newNodes = new List<_Node<K, V>>.from(_nodes)
+        ..removeAt(_index(bit));
       return new _BitmapIndexNode(newNodes, _shift, _bitmap ^ bit);
     } else {
       return this;
@@ -354,7 +355,8 @@ class _BitmapIndexNode<K, V> extends _Node<K, V> {
       int n = popcount(_bitmap);
       if (n >= 16) {
         // convert to [ArrayNode]
-        final newNodes = new List<_Node<K, V>>.filled(32, null, growable: false);
+        final newNodes =
+            new List<_Node<K, V>>.filled(32, null, growable: false);
         newNodes[mask(hash, shift)] = new _LeafNode<K, V>(key, value);
         int j = 0;
         for (int i = 0; i < 32; i++) {
