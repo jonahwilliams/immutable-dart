@@ -11,7 +11,7 @@ const int _trieSize = 32;
 abstract class Vector<T> implements Iterable<T> {
   const Vector._();
 
-  /// Creates a new Vector from any interable.
+  /// Creates a new Vector from any Iterable.
   ///
   /// example:
   ///   final xs = new Vector.fromIterable([1, 2, 3, 4]);
@@ -56,12 +56,7 @@ abstract class Vector<T> implements Iterable<T> {
   Iterator<T> get iterator => new _VectorIterator(this);
 
   @override
-  T get last {
-    if (isEmpty) {
-      throw new StateError('Vector is empty and has no last value.');
-    }
-    return this[length - 1];
-  }
+  T get last => this[length - 1];
 
   @override
   int get length;
@@ -88,10 +83,11 @@ abstract class Vector<T> implements Iterable<T> {
   /// Throws a state error if it is empty.
   Vector<T> removeLast();
 
+
   /// Creates a new Vector with [value] append to the end.
   Vector<T> append(T value);
 
-  /// Creates a new Vector with the _values from [other] concatenated 
+  /// Creates a new Vector with the _values from [other] concatenated
   /// on the end.
   Vector<T> concat(Iterable<T> other);
 
@@ -393,6 +389,7 @@ class Leaf<T> extends Node<T> {
 
   Iterable<T> traverse() sync* {
     for (int i = 0; i < _trieSize; i++) {
+
       final value = values[i];
       if (value == null) {
         return;

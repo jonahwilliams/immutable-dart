@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 
-import 'package:immutable/immutable.dart';
+import 'package:immutable/src/vector.dart';
 
 void main() {
   group('Vector', () {
