@@ -26,7 +26,7 @@ abstract class Dictionary<K, V> {
   factory Dictionary.empty() => const _EmptyDictionary();
 
   /// Creates a new [Dictionary] from a [Map].
-  factory Dictionary.from(Map<K,V> other) {
+  factory Dictionary.from(Map<K, V> other) {
     var result = new Dictionary<K, V>.empty();
     other.forEach((K k, V v) {
       result = result.assoc(k, v);
@@ -124,8 +124,8 @@ class _EmptyDictionary<K, V> extends Dictionary<K, V> {
 
   @override
   Dictionary<K, V> assoc(K key, V value) {
-    final root = new BitmapIndexNode<K,V>.empty(0)
-      .assoc(0, key.hashCode, key, value);
+    final root =
+        new BitmapIndexNode<K, V>.empty(0).assoc(0, key.hashCode, key, value);
     return new _NodeDictionary._fromRoot(root, 1);
   }
 
@@ -137,19 +137,18 @@ class _EmptyDictionary<K, V> extends Dictionary<K, V> {
 }
 
 class _NodeDictionary<K, V> extends Dictionary<K, V> {
-  final Node<K,V> _root;
+  final Node<K, V> _root;
 
   @override
   final int size;
 
-  _NodeDictionary._fromRoot(this._root, this.size): super._();
+  _NodeDictionary._fromRoot(this._root, this.size) : super._();
 
   @override
   Iterable<K> get keys => _root.traverseKeys();
 
   @override
   Iterable<V> get values => _root.traverseValues();
-
 
   @override
   bool containsKey(K key) => _root.find(key.hashCode, key) != null;
@@ -170,7 +169,6 @@ class _NodeDictionary<K, V> extends Dictionary<K, V> {
 
   @override
   Dictionary<K, V> merge(Dictionary<K, V> other) => other;
-
 
   @override
   Dictionary<K, V> assoc(K key, V value) {
@@ -197,9 +195,12 @@ int bitpos(int hash, int shift) => 1 << mask(hash, shift);
 
 /// bit magic
 int popcount(int i) {
-  i = i - ((i >> 1) & 0x55555555);
+  i -= ((i >> 1) & 0x55555555);
   i = (i & 0x33333333) + ((i >> 2) & 0x33333333);
-  return (((i + (i >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
+  i = ((i + (i >> 4)) & 0x0F0F0F0F);
+  i += (i >> 8);
+  i += (i >> 16);
+  return (i & 0x0000003F);
 }
 
 /// [Node] is an interface for building hash tries.
@@ -283,21 +284,21 @@ class ArrayNode<K, V> extends Node<K, V> {
   @override
   Iterable<_Tuple2<K, V>> traverseBoth() sync* {
     for (final node in _nodes) {
-      yield* node.traverseBoth();
+      yield* node?.traverseBoth();
     }
   }
 
   @override
   Iterable<K> traverseKeys() sync* {
     for (final node in _nodes) {
-      yield* node.traverseKeys();
+      yield* node?.traverseKeys();
     }
   }
 
   @override
   Iterable<V> traverseValues() sync* {
     for (final node in _nodes) {
-      yield* node.traverseValues();
+      yield* node?.traverseValues();
     }
   }
 }
@@ -330,11 +331,11 @@ class BitmapIndexNode<K, V> extends Node<K, V> {
   }
 
   @override
-  Node<K,V> remove(int shift, int hash, K key) {
+  Node<K, V> remove(int shift, int hash, K key) {
     final bit = bitpos(hash, _shift);
     if ((_bitmap & bit) != 0) {
       // TODO: compaction to null if empty.
-      final newNodes = new List<Node<K,V>>.from(_nodes)..removeAt(_index(bit));
+      final newNodes = new List<Node<K, V>>.from(_nodes)..removeAt(_index(bit));
       return new BitmapIndexNode(newNodes, _shift, _bitmap ^ bit);
     } else {
       return this;
@@ -342,36 +343,36 @@ class BitmapIndexNode<K, V> extends Node<K, V> {
   }
 
   @override
-  Node<K,V> assoc(int shift, int hash, K key, V value) {
+  Node<K, V> assoc(int shift, int hash, K key, V value) {
     int bit = bitpos(hash, shift);
-		int index = _index(bit);
-		if((_bitmap & bit) != 0) {
-			final newNodes = new List<Node<K,V>>.from(_nodes, growable: false);
+    int index = _index(bit);
+    if ((_bitmap & bit) != 0) {
+      final newNodes = new List<Node<K, V>>.from(_nodes, growable: false);
       newNodes[index] = _nodes[index].assoc(shift + 5, hash, key, value);
       return new BitmapIndexNode(newNodes, shift, _bitmap);
-		} else {
-		    int n = popcount(_bitmap);
-        if (n >= 16) {
-          // convert to [ArrayNode]
-          final newNodes = new List<Node<K,V>>.filled(32, null, growable: false);
-          newNodes[mask(hash, shift)] = new LeafNode<K,V>(key, value);
-          int j = 0;
-          for (int i = 0; i < 32; i++) {
-            if (((_bitmap >> i) & 1) != 0) {
-              newNodes[i] = _nodes[j];
-              j++;
-            }
+    } else {
+      int n = popcount(_bitmap);
+      if (n >= 16) {
+        // convert to [ArrayNode]
+        final newNodes = new List<Node<K, V>>.filled(32, null, growable: false);
+        newNodes[mask(hash, shift)] = new LeafNode<K, V>(key, value);
+        int j = 0;
+        for (int i = 0; i < 32; i++) {
+          if (((_bitmap >> i) & 1) != 0) {
+            newNodes[i] = _nodes[j];
+            j++;
           }
-          return new ArrayNode<K,V>(newNodes, shift, n);
-        } else {
-          final newNodes = new List<Node<K,V>>(n + 1);
-          for (int i = 0; i < n; i++) {
-            newNodes[i] = _nodes[i];
-          }
-          newNodes[index] = new LeafNode<K,V>(key, value);
-          return new BitmapIndexNode<K,V>(newNodes, shift, _bitmap | bit);
         }
-		}
+        return new ArrayNode<K, V>(newNodes, shift, n);
+      } else {
+        final newNodes = new List<Node<K, V>>();
+        for (int i = 0; i < n; i++) {
+          newNodes.add(_nodes[i]);
+        }
+        newNodes.insert(index, new LeafNode<K, V>(key, value));
+        return new BitmapIndexNode<K, V>(newNodes, shift, _bitmap | bit);
+      }
+    }
   }
 
   @override
@@ -404,7 +405,9 @@ class LeafNode<K, V> extends Node<K, V> {
   final int _hashcode;
 
   ///
-  LeafNode(K key, this._value) : _hashcode = key.hashCode, _key = key;
+  LeafNode(K key, this._value)
+      : _hashcode = key.hashCode,
+        _key = key;
 
   /// Once we have reached a [LeafNode], find just returns the values
   @override
@@ -413,13 +416,12 @@ class LeafNode<K, V> extends Node<K, V> {
   /// assoc on a [LeafNode] might mean a collision.
   @override
   Node<K, V> assoc(int shift, int hash, K key, V value) {
-    if (_hashcode == hash) {
+    if (_hashcode == hash || shift > 32) {
       return new CollisionNode([_key, key], [_value, value], hash);
     }
-    final first = new LeafNode<K, V>(_key, _value);
-    final second = new LeafNode<K, V>(key, value);
-    return new BitmapIndexNode<K, V>([first, second], shift,
-      ((0 | bitpos(_hashcode, shift) | bitpos(hash, shift))));
+    return new BitmapIndexNode<K, V>.empty(shift)
+        .assoc(shift, _hashcode, _key, _value)
+        .assoc(shift, hash, key, value);
   }
 
   @override
@@ -470,9 +472,15 @@ class CollisionNode<K, V> extends Node<K, V> {
     return null;
   }
 
-  /// Assoc to a CollisionNode means that there is another collision
+  /// Assoc to a CollisionNode means that there is another collision,
+  /// or that we need to deepen the tree.
   @override
   Node<K, V> assoc(int shift, int hash, K key, V value) {
+    if (hash != _hashcode) {
+      return new BitmapIndexNode<K, V>(
+              [this], shift, (0 | bitpos(_hashcode, shift)))
+          .assoc(shift, hash, key, value);
+    }
     final n = _keys.length;
     final newKeys = new List<K>(n + 1);
     final newValues = new List<V>(n + 1);

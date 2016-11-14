@@ -1,6 +1,5 @@
 analyzer:
   strong-mode: true
-<<<<<<< HEAD
 
 linter:
   rules:
@@ -54,5 +53,3 @@ linter:
     - unnecessary_getters_setters
     - unrelated_type_equality_checks
     - valid_regexps
-=======
->>>>>>> 982e9b94bc3393b9135a549c11a3f0caef3ec5fb
