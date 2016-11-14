@@ -1,3 +1,5 @@
+library immutable.src.dictionary;
+
 /// A Mapping from values of [K] to values of [V]
 ///
 /// [Dictionary] is immutable, meaning the associations in a given
@@ -189,10 +191,12 @@ class _NodeDictionary<K, V> extends Dictionary<K, V> {
   }
 }
 
-/// bit magic
+/// Returns the value of a given offset of 5 bits.
+///
+/// will always be a value between 0 and 31.
 int mask(int hash, int shift) => ((hash & 0xFFFFFFFF) >> shift) & 0x01F;
 
-/// bit magic
+/// Returns the offset of the bit in the hashcode.
 int bitpos(int hash, int shift) => 1 << mask(hash, shift);
 
 /// The population count algorithm returns the number of 1s in a bitstring.

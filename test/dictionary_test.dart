@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
 
-import '../lib/src/dictionary.dart';
+import 'package:immutable/src/dictionary.dart';
 
 void main() {
   group('Dictionary', () {
